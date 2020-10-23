@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-namespace Lab3Q1
+
+namespace lab3
 {
     public class WordCountTester
     {
         static int Main()
         {
-          try {
+            try
+            {
 
 
-              //=================================================
-              // Implement your tests here. Check all the edge case scenarios.
-              // Create a large list which iterates over WCTester
-              //=================================================
+                //=================================================
+                // Implement your tests here. Check all the edge case scenarios.
+                // Create a large list which iterates over WCTester
+                //=================================================
 
-              WCTester(line, startIdx, expectedResults);
+                WCTester(line, startIdx, expectedResults);
 
-            } catch(UnitTestException e) {
-              Console.WriteLine(e);
+            }
+            catch (UnitTestException e)
+            {
+                Console.WriteLine(e);
             }
 
         }
@@ -30,17 +34,19 @@ namespace Lab3Q1
          * @param expected expected answer
          * @throws UnitTestException if the test fails
          */
-          static void WCTester(string line, int start_idx, int expected) {
+        static void WCTester(string line, int start_idx, int expected)
+        {
 
             //=================================================
             // Implement: comparison between the expected and
             // the actual word counter results
             //=================================================
 
-            if (result != expected) {
-              throw new Lab3Q1.UnitTestException(ref line, start_idx, result, expected, String.Format("UnitTestFailed: result:{0} expected:{1}, line: {2} starting from index {3}", result, expected, line, start_idx));
+            if (result != expected)
+            {
+                throw new Lab3Q1.UnitTestException(ref line, start_idx, result, expected, String.Format("UnitTestFailed: result:{0} expected:{1}, line: {2} starting from index {3}", result, expected, line, start_idx));
             }
 
-           }
+        }
     }
 }

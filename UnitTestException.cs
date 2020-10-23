@@ -1,7 +1,7 @@
 ﻿using System;
-namespace Lab3Q1
+namespace lab3
 {
-    public class UnitTestException: Exception
+    public class UnitTestException : Exception
     {
         private string line_;
         private int idx_;

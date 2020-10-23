@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
@@ -9,12 +9,12 @@ namespace Lab3Q1
     {
         static void Main(string[] args)
         {
-          // map and mutex for thread safety
-          Mutex mutex = new Mutex();
-          Dictionary<string, int> wcountsSingleThread = new Dictionary<string, int>();
+            // map and mutex for thread safety
+            Mutex mutex = new Mutex();
+            Dictionary<string, int> wcountsSingleThread = new Dictionary<string, int>();
 
 
-          var filenames = new List<string> {
+            var filenames = new List<string> {
                 "../../data/shakespeare_antony_cleopatra.txt",
                 "../../data/shakespeare_hamlet.txt",
                 "../../data/shakespeare_julius_caesar.txt",
@@ -27,23 +27,23 @@ namespace Lab3Q1
                 "../../data/shakespeare_romeo_and_juliet.txt",
            };
 
-           //=============================================================
-           // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN SINGLE THREAD
-           //=============================================================
+            //=============================================================
+            // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN SINGLE THREAD
+            //=============================================================
 
 
 
 
-           Console.WriteLine( "SingleThread is Done!");
-           //=============================================================
-           // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN MULTIPLE THREADS
-           //=============================================================
+            Console.WriteLine("SingleThread is Done!");
+            //=============================================================
+            // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN MULTIPLE THREADS
+            //=============================================================
 
 
 
 
-           Console.WriteLine( "MultiThread is Done!");
-           return 0;
+            Console.WriteLine("MultiThread is Done!");
+            return 0;
         }
     }
 }
