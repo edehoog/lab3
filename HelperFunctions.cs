@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
-
+using System.Security.Cryptography;
 
 namespace lab3
 {
@@ -22,10 +22,10 @@ namespace lab3
                 return 0;
             }
 
-            string lineSection = line.Substring(start_idx, :);
+            string lineSection = line.Substring(start_idx);
 
             //what if multiple delimiters beside eachother
-            char[] delimiterChars = { ' ', ',', '.', ':', ';', '!' '?' }
+            char[] delimiterChars = { ' ', ',', '.', ':', ';', '!', '?' };
 
             string[] words = lineSection.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
 
@@ -33,131 +33,155 @@ namespace lab3
 
             return count;
         }
-    }
-
-
-    /**
-    * Reads a file to count the number of words each actor speaks.
-    *
-    * @param filename file to open
-    * @param mutex mutex for protected access to the shared wcounts map
-    * @param wcounts a shared map from character -> word count
-    */
-    public static void CountCharacterWords(string filename, Mutex mutex, Dictionary<string, int> wcounts)
-    {
-
-        //===============================================
-        //  IMPLEMENT THIS METHOD INCLUDING THREAD SAFETY
-        //===============================================
-
-        string line;  // for storing each line read from the file
-        string character = "";  // empty character to start
-        System.IO.StreamReader file = new System.IO.StreamReader(filename);
-
-        while ((line = file.ReadLine()) != null)
+        /**
+        * Reads a file to count the number of words each actor speaks.
+        *
+        * @param filename file to open
+        * @param mutex mutex for protected access to the shared wcounts map
+        * @param wcounts a shared map from character -> word count
+        */
+        public static void CountCharacterWords(string filename, Mutex mutex, Dictionary<string, int> wcounts)
         {
-            //=================================================
-            // YOUR JOB TO ADD WORD COUNT INFORMATION TO MAP
-            //=================================================
+            //===============================================
+            //  IMPLEMENT THIS METHOD INCLUDING THREAD SAFETY
+            //===============================================
 
-            // Is the line a dialogueLine?
-            //    If yes, get the index and the character name.
-            //      if index > 0 and character not empty
-            //        get the word counts
-            //          if the key exists, update the word counts
-            //          else add a new key-value to the dictionary
-            //    reset the character
+            string line;  // for storing each line read from the file
+            string character = "";  // empty character to start
+            System.IO.StreamReader file = new System.IO.StreamReader(filename);
 
-        }
-        // Close the file
-    }
-
-
-
-    /**
-     * Checks if the line specifies a character's dialogue, returning
-     * the index of the start of the dialogue.  If the
-     * line specifies a new character is speaking, then extracts the
-     * character's name.
-     *
-     * Assumptions: (doesn't have to be perfect)
-     *     Line that starts with exactly two spaces has
-     *       CHARACTER. <dialogue>
-     *     Line that starts with exactly four spaces
-     *       continues the dialogue of previous character
-     *
-     * @param line line to check
-     * @param character extracted character name if new character,
-     *        otherwise leaves character unmodified
-     * @return index of start of dialogue if a dialogue line,
-     *      -1 if not a dialogue line
-     */
-    static int IsDialogueLine(string line, ref string character)
-    {
-
-        // new character
-        if (line.Length >= 3 && line[0] == ' '
-            && line[1] == ' ' && line[2] != ' ')
-        {
-            // extract character name
-
-            int start_idx = 2;
-            int end_idx = 3;
-            while (end_idx <= line.Length && line[end_idx - 1] != '.')
+            while ((line = file.ReadLine()) != null)
             {
-                ++end_idx;
+                //=================================================
+                // YOUR JOB TO ADD WORD COUNT INFORMATION TO MAP
+                //=================================================
+
+                // Is the line a dialogueLine?
+                int dialogueIndex = IsDialogueLine(line, ref character); 
+
+                //    If yes, get the index and the character name.
+                //      if index > 0 and character not empty
+                if(dialogueIndex > 0 && character != "")
+                {
+
+                    //        get the word counts
+                    int wordCount = WordCount(ref line, dialogueIndex);
+
+                    mutex.WaitOne();
+                    //          if the key exists, update the word counts
+                    if (wcounts.ContainsKey(character))
+                    {
+                        
+                        wcounts[character] += wordCount;
+                        
+                    }
+                    //          else add a new key-value to the dictionary
+                    else
+                    {
+                        wcounts[character] = wordCount;
+                    }
+                    mutex.ReleaseMutex();
+                }
+                //    reset the character
+                character = "";
+            }
+            // Close the file
+            file.Close();
+        }
+        /**
+         * Checks if the line specifies a character's dialogue, returning
+         * the index of the start of the dialogue.  If the
+         * line specifies a new character is speaking, then extracts the
+         * character's name.
+         *
+         * Assumptions: (doesn't have to be perfect)
+         *     Line that starts with exactly two spaces has
+         *       CHARACTER. <dialogue>
+         *     Line that starts with exactly four spaces
+         *       continues the dialogue of previous character
+         *
+         * @param line line to check
+         * @param character extracted character name if new character,
+         *        otherwise leaves character unmodified
+         * @return index of start of dialogue if a dialogue line,
+         *      -1 if not a dialogue line
+         */
+        static int IsDialogueLine(string line, ref string character)
+        {
+            //can debig but it is completed to an extent that is usable for the sake of this lab
+
+            // new character
+            if (line.Length >= 3 && line[0] == ' '
+                && line[1] == ' ' && line[2] != ' ')
+            {
+                // extract character name
+
+                int start_idx = 2;
+                int end_idx = 3;
+                while (end_idx <= line.Length && line[end_idx - 1] != '.')
+                {
+                    ++end_idx;
+                }
+
+                // no name found
+                if (end_idx >= line.Length)
+                {
+                    return 0;
+                }
+
+                // extract character's name
+                character = line.Substring(start_idx, end_idx - start_idx - 1);
+                return end_idx;
             }
 
-            // no name found
-            if (end_idx >= line.Length)
+            // previous character
+            if (line.Length >= 5 && line[0] == ' '
+                && line[1] == ' ' && line[2] == ' '
+                && line[3] == ' ' && line[4] != ' ')
             {
-                return 0;
+                // continuation
+                return 4;
             }
 
-            // extract character's name
-            character = line.Substring(start_idx, end_idx - start_idx - 1);
-            return end_idx;
+            return 0;
         }
 
-        // previous character
-        if (line.Length >= 5 && line[0] == ' '
-            && line[1] == ' ' && line[2] == ' '
-            && line[3] == ' ' && line[4] != ' ')
+        /**
+         * Sorts characters in descending order by word count
+         *
+         * @param wcounts a map of character -> word count
+         * @return sorted vector of {character, word count} pairs
+         */
+        public static List<Tuple<int, string>> SortCharactersByWordcount(Dictionary<string, int> wordcount)
         {
-            // continuation
-            return 4;
+            //can be altered to a sorted dictionary
+
+            // Implement sorting by word count here
+            List<Tuple<int, string>> sortedByValueList = new List<Tuple<int, string>>();
+
+            foreach (KeyValuePair<string, int> pair in wordcount.OrderByDescending(key => key.Value))
+            {
+                sortedByValueList.Add(Tuple.Create(pair.Value, pair.Key));
+            }
+
+            return sortedByValueList;
+
         }
 
-        return 0;
+        /**
+         * Prints the List of Tuple<int, string>
+         *
+         * @param sortedList
+         * @return Nothing
+         */
+        public static void PrintListofTuples(List<Tuple<int, string>> sortedList)
+        { 
+            // Implement printing here
+            foreach(Tuple<int, string> tuple in sortedList)
+            {
+                Console.WriteLine("Word count: {0} - Character: {1}", tuple.Item1.ToString(), tuple.Item2);
+            }
+
+        }
     }
-
-    /**
-     * Sorts characters in descending order by word count
-     *
-     * @param wcounts a map of character -> word count
-     * @return sorted vector of {character, word count} pairs
-     */
-    public static List<Tuple<int, string>> SortCharactersByWordcount(Dictionary<string, int> wordcount)
-    {
-
-        // Implement sorting by word count here
-
-        return sortedByValueList;
-
-    }
-
-
-    /**
-     * Prints the List of Tuple<int, string>
-     *
-     * @param sortedList
-     * @return Nothing
-     */
-    public static void PrintListofTuples(List<Tuple<int, string>> sortedList)
-    {
-
-        // Implement printing here
-
-    }
-}
 }
