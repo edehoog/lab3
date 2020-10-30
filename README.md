@@ -1,3 +1,15 @@
+Name: Elija de Hoog
+Student Number: 37121209
+
+### Question 1
+To test the program without needing to go through all of the plays, you can take exerpts from the play and use them as strings in the unit tests. This is effective because it can test the syntax used in the plays and if you take a good variety of exerpts the program should be able to handle all of the plays as long as there are no major outliers.
+
+### Question 2 
+When running just the 10 given files in the program the execution times I collected were 221ms for the single thread and 414ms for the multithreaded implementation. When doubling the amount of files to 20 files in the program the execution times I colected were 416ms and 742ms. The multithreading did not help in this case. I believe this is because unlike the last lab where you could split all of the data between x number of threads, for this lab each thread can only handle one file at a time (at least in my implementation). Due to the overhead that the threads impose even assinging a thread to each file will take longer. I tested using a threadpool which I thought could help reduce the overhead but I was unable to successfully get this to work with the outline given. The threadpool could help with the memory issues and when dealing with a very large amount of files could be faster than the single threaded operation.
+
+### Question 3
+The simplest implementation that I can think of to seperate characters by play would be to pass the filename string into the CountCharacterWords method and then pass it into the IsDialouge method and append the play title to the characters name. Another option would be to add a list in the place of the characters name in the dictionary and then have one element of the list contain the characters name and another element that contains the play the character was in and then you can check both of those pieces of data when incremeneting the word counts of the characters.
+
 ---
 layout: lab
 title:  Lab 3 - Testing and Mutexes
