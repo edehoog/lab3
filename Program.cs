@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace lab3
 {
@@ -17,6 +18,7 @@ namespace lab3
             Stopwatch stopwatch = new Stopwatch();
 
             var filenames = new List<string> {
+                /*"data/testing_purposes.txt",*/
                 "data/shakespeare_antony_cleopatra.txt",
                 "data/shakespeare_hamlet.txt",
                 "data/shakespeare_julius_caesar.txt",
@@ -27,7 +29,9 @@ namespace lab3
                 "data/shakespeare_much_ado.txt",
                 "data/shakespeare_othello.txt",
                 "data/shakespeare_romeo_and_juliet.txt",
-           };
+                /*"data/shakespeare_king_john.txt",
+                "data/shakespeare_king_lear.txt"*/
+            };
 
             //=============================================================
             // YOUR IMPLEMENTATION HERE TO COUNT WORDS IN SINGLE THREAD
@@ -57,6 +61,7 @@ namespace lab3
             List<Thread> threads = new List<Thread>();
 
             int count = 0;
+
             stopwatch.Start();
             foreach (string name in filenames)
             {  

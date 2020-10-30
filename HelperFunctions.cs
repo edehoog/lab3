@@ -16,16 +16,13 @@ namespace lab3
          */
         public static int WordCount(ref string line, int start_idx)
         {
-            // YOUR IMPLEMENTATION HERE
             if (line == String.Empty)
             {
                 return 0;
             }
-
             string lineSection = line.Substring(start_idx);
 
-            //what if multiple delimiters beside eachother
-            char[] delimiterChars = { ' ', ',', '.', ':', ';', '!', '?' };
+            char delimiterChars = ' ';
 
             string[] words = lineSection.Split(delimiterChars, StringSplitOptions.RemoveEmptyEntries);
 
@@ -42,49 +39,38 @@ namespace lab3
         */
         public static void CountCharacterWords(string filename, Mutex mutex, Dictionary<string, int> wcounts)
         {
-            //===============================================
-            //  IMPLEMENT THIS METHOD INCLUDING THREAD SAFETY
-            //===============================================
-
             string line;  // for storing each line read from the file
             string character = "";  // empty character to start
             System.IO.StreamReader file = new System.IO.StreamReader(filename);
 
             while ((line = file.ReadLine()) != null)
             {
-                //=================================================
-                // YOUR JOB TO ADD WORD COUNT INFORMATION TO MAP
-                //=================================================
-
                 // Is the line a dialogueLine?
                 int dialogueIndex = IsDialogueLine(line, ref character); 
 
-                //    If yes, get the index and the character name.
-                //      if index > 0 and character not empty
-                if(dialogueIndex > 0 && character != "")
+                // If yes, get the index and the character name.
+                // if index > 0 and character not empty
+                if(dialogueIndex > 0 && character != string.Empty)
                 {
-
-                    //        get the word counts
+                    // get the word counts
                     int wordCount = WordCount(ref line, dialogueIndex);
 
                     mutex.WaitOne();
-                    //          if the key exists, update the word counts
+                    // if the key exists, update the word counts
                     if (wcounts.ContainsKey(character))
                     {
-                        
                         wcounts[character] += wordCount;
-                        
                     }
-                    //          else add a new key-value to the dictionary
+                    //  else add a new key-value to the dictionary
                     else
                     {
                         wcounts[character] = wordCount;
                     }
                     mutex.ReleaseMutex();
                 }
-                //    reset the character
-                character = "";
             }
+            //Character reset
+            character = "";
             // Close the file
             file.Close();
         }
@@ -108,27 +94,24 @@ namespace lab3
          */
         static int IsDialogueLine(string line, ref string character)
         {
-            //can debig but it is completed to an extent that is usable for the sake of this lab
+            //can debug but it is completed to an extent that is usable for the sake of this lab
 
             // new character
             if (line.Length >= 3 && line[0] == ' '
                 && line[1] == ' ' && line[2] != ' ')
             {
                 // extract character name
-
                 int start_idx = 2;
                 int end_idx = 3;
                 while (end_idx <= line.Length && line[end_idx - 1] != '.')
                 {
                     ++end_idx;
                 }
-
                 // no name found
                 if (end_idx >= line.Length)
                 {
                     return 0;
                 }
-
                 // extract character's name
                 character = line.Substring(start_idx, end_idx - start_idx - 1);
                 return end_idx;
@@ -142,7 +125,6 @@ namespace lab3
                 // continuation
                 return 4;
             }
-
             return 0;
         }
 
@@ -154,8 +136,6 @@ namespace lab3
          */
         public static List<Tuple<int, string>> SortCharactersByWordcount(Dictionary<string, int> wordcount)
         {
-            //can be altered to a sorted dictionary
-
             // Implement sorting by word count here
             List<Tuple<int, string>> sortedByValueList = new List<Tuple<int, string>>();
 
@@ -165,9 +145,7 @@ namespace lab3
             }
 
             return sortedByValueList;
-
         }
-
         /**
          * Prints the List of Tuple<int, string>
          *
